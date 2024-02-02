@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Text;
 using System.Linq;
 using System.Reflection;
 using System.Security.Policy;
@@ -17,8 +18,8 @@ namespace Classe_frazione_forms
     {
         class frazione
         {
-            private double numeratore;
-            private double denominatore;
+            protected double numeratore;
+            protected double denominatore;
             public double Numeratore
             {
                 get => numeratore;
@@ -29,28 +30,26 @@ namespace Classe_frazione_forms
                 get => denominatore;
                 set => denominatore = value;
             }
+
+            private double MCD(double a, double b)
+            {
+                while (b != 0)
+                {
+                    double temp = b;
+                    b = a % b;
+                    a = temp;
+                }
+                return a;
+            }
+
             public string semplificafrazione()
             {
-                double resto = 0;
-                if (numeratore % denominatore == 0)
-                {
-                    for (double i = numeratore; i < denominatore; i++)
-                    {
-                        if (i % denominatore == 0)
-                        {
+                double mcd = MCD(numeratore, denominatore);
+                numeratore /= mcd;
+                denominatore /= mcd;
+                string result = $"{numeratore}/{denominatore}";
+                return result;
 
-                        }
-                    }
-                    //while (denominatore != 0)
-                    //{
-                    //    resto = numeratore % denominatore;
-                    //    numeratore = denominatore;
-                    //    denominatore = resto;
-                    //}
-                    //numeratore = numeratore % resto;
-                    //denominatore = denominatore % resto;
-                }
-                return (numeratore + "/" + denominatore);
             }
             public double somma()
             {
@@ -69,6 +68,50 @@ namespace Classe_frazione_forms
                 return numeratore / denominatore;
             }
         }
+        class derivata : frazione
+        {
+            private double esponente;
+            private double numerodecimale;
+            public double Esponente
+            {
+                get => esponente;
+                set => esponente = value;
+            }
+            public double Numerodecimale
+            {
+                get => numerodecimale;
+                set => numerodecimale = value;
+            }
+            public double rappresentazionedecimale()
+            {
+                return numeratore / denominatore;
+            }
+            public string conversionedecimalefrazione()
+            {
+                int precisioneMassima = 1000000;
+
+                double numeratore = numerodecimale;
+                double denominatore = 1;
+
+                for (int i = 1; i < precisioneMassima; i++)
+                {
+                    if (Math.Abs(Math.Round(numeratore) - numeratore) < 0)
+                        break;
+
+                    numeratore *= 10;
+                    denominatore *= 10;
+                }
+
+                return numeratore.ToString()+"/"+denominatore.ToString();
+
+            }
+            public string calcolaesponente()
+            {
+                double newnum = Math.Pow(numeratore, esponente);
+                double newden = Math.Pow(denominatore, esponente);
+                return newnum.ToString() + "/" + newden.ToString();                
+            }
+        }
         public Form1()
         {
             InitializeComponent();
@@ -77,6 +120,8 @@ namespace Classe_frazione_forms
         private void D_Click(object sender, EventArgs e)
         {
             frazione semplif = new frazione();
+            semplif.Numeratore = double.Parse(textBox1.Text);
+            semplif.Denominatore = double.Parse(textBox2.Text);
             Ris.Text = semplif.semplificafrazione();
         }
 
@@ -112,6 +157,30 @@ namespace Classe_frazione_forms
             semplif.Numeratore = double.Parse(textBox1.Text);
             semplif.Denominatore = double.Parse(textBox2.Text);
             Ris.Text = semplif.dividi().ToString();
+        }
+
+        private void rappdeci_Click(object sender, EventArgs e)
+        {
+            derivata semplif = new derivata();
+            semplif.Numeratore = double.Parse(textBox1.Text);
+            semplif.Denominatore = double.Parse(textBox2.Text);
+            Ris.Text = semplif.rappresentazionedecimale().ToString();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            derivata semplif = new derivata();
+            semplif.Numerodecimale = double.Parse(textBox3.Text);
+            Ris.Text = semplif.conversionedecimalefrazione();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            derivata semplif = new derivata();
+            semplif.Numeratore = double.Parse(textBox1.Text);
+            semplif.Denominatore = double.Parse(textBox2.Text);
+            semplif.Esponente = double.Parse(textBox4.Text);
+            Ris.Text = semplif.calcolaesponente();
         }
     }
 }
